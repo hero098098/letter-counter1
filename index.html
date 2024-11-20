@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letter Counter with Google Sheets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Letter Counter with Logging</h1>
+    <p>Enter your name, and we'll count the letters and save the history to Google Sheets!</p>
+    <input type="text" id="nameInput" placeholder="Enter your name">
+    <button onclick="countAndLog()">Count and Log</button>
+    <div id="result"></div>
+
+    <script>
+        function countAndLog() {
+            const name = document.getElementById('nameInput').value.trim();
+            if (name === "") {
+                document.getElementById('result').textContent = "Please enter a valid name!";
+                return;
+            }
+
+            // Calculate letter count
+            const letterCount = name.replace(/\s/g, "").length;
+            const date = new Date().toLocaleDateString();
+            const time = new Date().toLocaleTimeString();
+
+            document.getElementById('result').textContent = `Your name has ${letterCount} letters.`;
+
+            // Prepare data to send
+            const entry = {
+                name,
+                letterCount,
+                date,
+                time,
+            };
+
+            // Send data to Google Sheets
+            fetch("https://script.google.com/macros/s/AKfycbxuZXrzSG-j1briZffeMTAA7G0vy7O-_ZmKDKjpkYv7c6gAv2u4qhYhaUzU4UdKABXZ/exec", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(entry),
+            })
+            .then(response => response.text())
+            .then(data => console.log("Data logged successfully:", data))
+            .catch(error => console.error("Error logging data:", error));
+        }
+    </script>
+</body>
+</html>
